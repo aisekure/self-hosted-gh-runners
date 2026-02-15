@@ -3,7 +3,7 @@ name: deploy Github Runners on AWS
 on:
   push:
     branches:
-      - main
+      - master
 
 permissions:
   id-token: write
