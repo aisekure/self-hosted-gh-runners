@@ -1,0 +1,72 @@
+name: deploy Github Runners on AWS
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  SECRET_NAME="${{ secrets.AWS_SECRET_NAME}}"
+  SECRET_REGION="${{ secrets.AWS_REGION }}"
+  AUTO_SCALING_MAX="10"
+  AUTO_SCALING_GROUP_NAME="aws-gh-actions-runners"
+  AUTO_SCALING_GROUP_REGION="${{ secrets.AWS_REGION }}"
+  GITHUB_OWNER="${{ github.repository_owner }}"
+  REPOSITORY_NAME="${{ github.event.repository.name }}"
+
+jobs:
+  deploy-github-actions-runners:
+    runs-on: ubuntu-latest
+    name: deploy runner
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v5
+
+    - name: Configure AWS Credentials (OIDC)
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: 'arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GithubCdkDeployRole'
+        aws-region: "${{ secrets.AWS_REGION }}"
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.13"
+
+    - name: Install dependencies
+      run: |
+        npm install -g aws-cdk
+        npm install
+        cd lambda/auto-scaling-lambda
+        npm install
+
+    - name: Generate GitHub App Token
+      id: generate_token
+      uses: actions/create-github-app-token@v1
+      with:
+        app-id: ${{ secrets.APP_ID }}
+        private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+    - name: Get Registration Token
+      id: get_reg_token
+      run: |
+        # Use the app token to request a runner registration token
+        REG_TOKEN=$(gh api --method POST \
+          -H "Accept: application/vnd.github+json" \
+          -H "X-GitHub-Api-Version: 2022-11-28" \
+          /repos/${{ github.repository_owner }}/${{ github.event.repository.name }}/actions/runners/registration-token \
+          --jq .token)
+        echo "token=${REG_TOKEN}" >> $GITHUB_OUTPUT
+        echo "GITHUB_AUTH_TOKEN=${REG_TOKEN}" >> $GITHUB_OUTPUT
+      env:
+        GH_TOKEN: ${{ steps.generate_token.outputs.token }}
+
+    - name: CDK Bootstrap (first time only)
+      run: cdk bootstrap
+
+    - name: Deploy CDK
+      run: cdk deploy --require-approval never
