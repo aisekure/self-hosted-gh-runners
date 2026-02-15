@@ -10,13 +10,13 @@ permissions:
   contents: read
 
 env:
-  SECRET_NAME="${{ secrets.AWS_SECRET_STORE_NAME}}"
-  SECRET_REGION="${{ secrets.AWS_REGION }}"
-  AUTO_SCALING_MAX="10"
-  AUTO_SCALING_GROUP_NAME="aws-gh-actions-runners"
-  AUTO_SCALING_GROUP_REGION="${{ secrets.AWS_REGION }}"
-  GITHUB_OWNER="${{ github.repository_owner }}"
-  REPOSITORY_NAME="${{ github.event.repository.name }}"
+  SECRET_NAME: "${{ secrets.AWS_SECRET_STORE_NAME}}"
+  SECRET_REGION: "${{ secrets.AWS_REGION }}"
+  AUTO_SCALING_MAX: "10"
+  AUTO_SCALING_GROUP_NAME: "aws-gh-actions-runners"
+  AUTO_SCALING_GROUP_REGION: "${{ secrets.AWS_REGION }}"
+  GITHUB_OWNER: "${{ github.repository_owner }}"
+  REPOSITORY_NAME: "${{ github.event.repository.name }}"
 
 jobs:
   deploy-github-actions-runners:
