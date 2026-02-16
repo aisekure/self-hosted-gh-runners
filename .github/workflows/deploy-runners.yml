@@ -65,7 +65,10 @@ jobs:
       env:
         GH_TOKEN: ${{ steps.generate_token.outputs.token }}
 
-    - name: CDK Bootstrap (first time only)
+    - name: CDK Destroy (clean previous installs)
+      run: cdk destroy
+
+    - name: CDK Bootstrap (Bookstrap AWS)
       run: cdk bootstrap
 
     - name: Deploy CDK
