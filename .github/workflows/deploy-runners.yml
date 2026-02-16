@@ -70,7 +70,7 @@ jobs:
         cdk destroy --all  --force || true
 
     - name: CDK Bootstrap (Bookstrap AWS)
-      run: cdk bootstrap --force
+      run: cdk bootstrap --force aws://${{ secrets.AWS_ACCOUNT_ID }}/us-east-1
 
     - name: Deploy CDK
       run: cdk deploy --require-approval never
