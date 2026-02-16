@@ -1,14 +1,29 @@
-# Welcome to your CDK TypeScript project
+# Overview
+The script automates the deployment and scaling of github runners in AWS based on the following flow:
 
-This is a blank project for CDK development with TypeScript.
+![Flow](docs/images/runner-workflow.png)
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+## Resource Created
+- AWS VPC
+- AWS Subnets and Route Table
+- AWS AutoScaling Group
+- EC2 instance
+- Launch Template
+- IAM Role
 
-## Useful commands
+## Deployment Steps
 
-* `npm run build`   compile typescript to js
-* `npm run watch`   watch for changes and compile
-* `npm run test`    perform the jest unit tests
-* `npx cdk deploy`  deploy this stack to your default AWS account/region
-* `npx cdk diff`    compare deployed stack with current state
-* `npx cdk synth`   emits the synthesized CloudFormation template
+### Required Environment variables
+- SECRET_REGION= "infrastructure  region"
+- AUTO_SCALING_MAX= "default scaling size of runners"
+- AUTO_SCALING_GROUP_NAME= "name of autoscaling group"
+- AUTO_SCALING_GROUP_REGION= "auto scaling group  region"
+- GITHUB_OWNER= "github owner i.e username or organisation name"
+- REPOSITORY_NAME= "repository name"
+- GITHUB_OWNER_TYPE= "repository owner type, is it organisation (represented by "org")  or user (represented by "user")"
+- GITHUB_AUTH_TOKEN= "github token"
+
+### Deployment Commands
+
+- cdk bootstrap
+- cdk deploy 

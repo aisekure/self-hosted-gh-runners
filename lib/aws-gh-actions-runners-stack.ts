@@ -17,14 +17,12 @@ const { env } = require("process");
 
 export interface AwsGithubActionsSelfHostedRunnerAutoscalingStackProps extends cdk.StackProps {
   maxInstances: string;
-  //keypairName: string;
   runnerName: string;
 }
 
 export class AwsGithubActionsSelfHostedRunnerAutoscalingStack extends Stack {
   constructor(scope: Construct, id: string, props?: AwsGithubActionsSelfHostedRunnerAutoscalingStackProps) {
     super(scope, id, props);
-    // configuring EC2
     const githubActionsVpc = new ec2.Vpc(this, "GithubActionsSelfHostedRunnerVPC", {
       maxAzs: 1,
       subnetConfiguration: [
@@ -68,7 +66,6 @@ export class AwsGithubActionsSelfHostedRunnerAutoscalingStack extends Stack {
         instanceType: instanceType,
         machineImage: ami,
         securityGroup: githubActionsSecurityGroup,
-        //keyName: props!!.keypairName,
         vpcSubnets: {
           subnetType: ec2.SubnetType.PUBLIC,
         },
@@ -84,16 +81,12 @@ export class AwsGithubActionsSelfHostedRunnerAutoscalingStack extends Stack {
     );
     userDataScript = userDataScript.replace(
       "<REPOSITORY_NAME>",
-       env.REPOSITORY_NAME //props!!.runnerName
+       env.REPOSITORY_NAME
     );
     
     githubActionsAutoScalingGroup.addUserData(userDataScript);
     const githubAuthSecret = new secretsmanager.Secret(this, "GithubActionsSelfHostedRunnerSecret", {
       secretName: "github-actions-self-hosted-runner-secret",
-      // secretObjectValue: {
-      //   resource_class: SecretValue.unsafePlainText(env.SELF_HOSTED_RUNNER_RESOURCE_CLASS),
-      //   circle_token: SecretValue.unsafePlainText(env.CIRCLECI_TOKEN),
-      // },
     });
 
     const lambdaPolicyDocument = new iam.PolicyDocument({

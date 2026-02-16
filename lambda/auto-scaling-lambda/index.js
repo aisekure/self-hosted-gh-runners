@@ -30,8 +30,6 @@ async function updateNumInstances(numInstances) {
 }
 
 async function getQueuedJobs() {
-  //const secret = await getSecret();
-  //const { github_token, github_owner, owner_type } = secret;
   github_token = env.GITHUB_AUTH_TOKEN
   github_owner = env.GITHUB_OWNER
   owner_type   = env.GITHUB_OWNER_TYPE
