@@ -66,10 +66,11 @@ jobs:
         GH_TOKEN: ${{ steps.generate_token.outputs.token }}
 
     - name: CDK Destroy (clean previous installs)
-      run: cdk destroy --all
+      run: |
+        cdk destroy --all  --force || true
 
     - name: CDK Bootstrap (Bookstrap AWS)
-      run: cdk bootstrap
+      run: cdk bootstrap --force
 
     - name: Deploy CDK
       run: cdk deploy --require-approval never
